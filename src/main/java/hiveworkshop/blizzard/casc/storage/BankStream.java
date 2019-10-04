@@ -115,8 +115,8 @@ public class BankStream {
 				throw new BufferOverflowException();
 			}
 
-			final ByteBuffer encodedBuffer = ((ByteBuffer)streamBuffer.slice().limit((int) encodedSize));
-			final ByteBuffer decodedBuffer = ((ByteBuffer)bankBuffer.slice().limit((int) decodedSize));
+			final ByteBuffer encodedBuffer = ((ByteBuffer)streamBuffer.slice().limit((int) encodedSize)).slice();
+			final ByteBuffer decodedBuffer = ((ByteBuffer)bankBuffer.slice().limit((int) decodedSize)).slice();
 
 			final char encodingMode = (char) encodedBuffer.get();
 			switch (encodingMode) {
