@@ -1,7 +1,55 @@
-plugins {
-    id 'java'
-}
-
+apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'com.github.inwc3'
+
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:18.0'
+
+    //labsCompile sourceSets.main.output
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'JCASC/src'
+        }
+
+        java.outputDir = file('build/main')
+    }
+//    labs {
+//        java {
+//            srcDir 'JCASC Lab/src'
+//        }
+//
+//        java.outputDir = file('build/labs')
+//        compileClasspath += sourceSets.main.runtimeClasspath
+//    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+wrapper {
+    gradleVersion = "5.1.1"
+    distributionType = Wrapper.DistributionType.ALL
+}
