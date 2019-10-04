@@ -48,12 +48,8 @@ public final class Key implements Comparable<Key> {
 
 		final Key otherKey = (Key) obj;
 		final int commonLength = Math.min(key.length, otherKey.key.length);
-		if (!ReteraCASCUtils.arraysEquals(key, 0, commonLength, otherKey.key, 0, commonLength)) {
-			return false;
-		}
-
-		return true;
-	}
+    return ReteraCASCUtils.arraysEquals(key, 0, commonLength, otherKey.key, 0, commonLength);
+  }
 
 	/**
 	 * Return the wrapped key array for low level interaction.

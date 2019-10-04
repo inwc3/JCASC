@@ -191,7 +191,7 @@ public final class VirtualFileSystem {
 	/**
 	 * Character encoding used internally by file paths.
 	 */
-	public static final Charset PATH_ENCODING = Charset.forName("UTF8");
+	public static final Charset PATH_ENCODING = StandardCharsets.UTF_8;
 
 	/**
 	 * Path separator used by path strings.
