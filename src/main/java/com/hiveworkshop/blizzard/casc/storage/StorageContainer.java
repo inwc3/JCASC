@@ -65,16 +65,15 @@ public class StorageContainer {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("FileEntry{key=");
-		builder.append(key);
-		builder.append(", size=");
-		builder.append(size);
-		builder.append(", flags=");
-		builder.append(Integer.toBinaryString(flags));
-		builder.append("}");
 
-		return builder.toString();
+    String builder = "FileEntry{key=" +
+      key +
+      ", size=" +
+      size +
+      ", flags=" +
+      Integer.toBinaryString(flags) +
+      "}";
+    return builder;
 	}
 
 	public long getSize() {

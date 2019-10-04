@@ -315,7 +315,7 @@ public final class VirtualFileSystem {
 		while (result && (nodeFragmentIndex < nodeFragmentCount)) {
 			final byte[] fragment = pathFragments[fragmentIndex + nodeFragmentIndex];
 			final byte[] nodeFragment = node.getFragment(nodeFragmentIndex);
-			result = result && ReteraCASCUtils.arraysEquals(fragment, fragmentOffset,
+			result = ReteraCASCUtils.arraysEquals(fragment, fragmentOffset,
 					Math.min(fragmentOffset + nodeFragment.length, fragment.length), nodeFragment, 0,
 					nodeFragment.length);
 			fragmentOffset = 0;
@@ -422,7 +422,7 @@ public final class VirtualFileSystem {
 	 *                     decoding path fragments into a path string.
 	 */
 	public List<PathResult> getAllFiles() throws IOException {
-		final ArrayList<PathResult> pathStringList = new ArrayList<PathResult>();
+		final ArrayList<PathResult> pathStringList = new ArrayList<>();
 
 		final int rootCount = tvfsRoot.getRootNodeCount();
 		for (int rootIndex = 0; rootIndex < rootCount; rootIndex += 1) {

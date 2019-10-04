@@ -1,4 +1,4 @@
-package hiveworkshop.lang;
+package com.hiveworkshop.lang;
 
 import com.hiveworkshop.blizzard.casc.io.WarcraftIIICASC;
 

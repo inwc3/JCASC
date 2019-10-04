@@ -75,8 +75,8 @@ public abstract class Hex {
 	}
 
 	public static void stringBufferAppendHex(final StringBuilder builder, final byte[] hex) {
-		for (int i = 0; i < hex.length; i += 1) {
-			stringBufferAppendHex(builder, hex[i]);
-		}
+    for (byte b : hex) {
+      stringBufferAppendHex(builder, b);
+    }
 	}
 }
