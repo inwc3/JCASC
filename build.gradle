@@ -3,8 +3,8 @@ apply plugin: 'maven'
 
 group = 'com.github.inwc3'
 
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -12,26 +12,6 @@ repositories {
 
 dependencies {
     compile 'com.google.guava:guava:18.0'
-
-    //labsCompile sourceSets.main.output
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir 'JCASC/src'
-        }
-
-        java.outputDir = file('build/main')
-    }
-//    labs {
-//        java {
-//            srcDir 'JCASC Lab/src'
-//        }
-//
-//        java.outputDir = file('build/labs')
-//        compileClasspath += sourceSets.main.runtimeClasspath
-//    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -47,10 +27,4 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives jar
     archives sourcesJar
-    //archives javadocJar
-}
-
-wrapper {
-    gradleVersion = "5.1.1"
-    distributionType = Wrapper.DistributionType.ALL
 }
