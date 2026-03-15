@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
+import java.util.stream.IntStream;
 
 import com.hiveworkshop.blizzard.casc.ConfigurationFile;
 import com.hiveworkshop.blizzard.casc.info.Info;
@@ -162,6 +164,20 @@ public class WarcraftIIICASC implements AutoCloseable {
 	private final VirtualFileSystem vfs;
 
 	/**
+	 * Known Warcraft III products.
+	 */
+	public enum Product {
+		/**
+		 * Warcraft III current release.
+		 */
+		w3,
+		/**
+		 * Warcraft III public test realm.
+		 */
+		w3t;
+	}
+
+	/**
 	 * Construct an interface to the CASC local storage used by Warcraft III. Can be
 	 * used to read data files from the local storage.
 	 * <p>
@@ -182,29 +198,66 @@ public class WarcraftIIICASC implements AutoCloseable {
 	 * @throws IOException If an exception occurs while mounting.
 	 */
 	public WarcraftIIICASC(final Path installFolder, final boolean useMemoryMapping) throws IOException {
+		this(installFolder, useMemoryMapping, (String) null);
+	}
+
+	/**
+	 * Construct an interface to the CASC local storage used by Warcraft III. Can be
+	 * used to read data files from the local storage.
+	 *
+	 * @param installFolder    Warcraft III installation folder.
+	 * @param useMemoryMapping If memory mapped IO should be used to read file data.
+	 * @param product          Product of build.
+	 * @throws IOException If an exception occurs while mounting.
+	 */
+	public WarcraftIIICASC(final Path installFolder, final boolean useMemoryMapping, final Product product)
+			throws IOException {
+		this(installFolder, useMemoryMapping, product.name());
+	}
+
+	/**
+	 * Construct an interface to the CASC local storage used by Warcraft III. Can be
+	 * used to read data files from the local storage.
+	 *
+	 * @param installFolder    Warcraft III installation folder.
+	 * @param useMemoryMapping If memory mapped IO should be used to read file data.
+	 * @param product          Product identifier string of build or null for first
+	 *                         declared build.
+	 * @throws IOException If an exception occurs while mounting.
+	 */
+	public WarcraftIIICASC(final Path installFolder, final boolean useMemoryMapping, final String product)
+			throws IOException {
 		final Path infoFilePath = installFolder.resolve(Info.BUILD_INFO_FILE_NAME);
 		buildInfo = new Info(ByteBuffer.wrap(Files.readAllBytes(infoFilePath)));
 
 		final int recordCount = buildInfo.getRecordCount();
 		if (recordCount < 1) {
-			throw new MalformedCASCStructureException("build info contains no records");
+			throw new MalformedCASCStructureException("build info does not contain any records");
 		}
 
-		// resolve the active record
-		final int activeFiledIndex = buildInfo.getFieldIndex("Active");
-		if (activeFiledIndex == -1) {
-			throw new MalformedCASCStructureException("build info contains no active field");
+		IntStream selectedBuilds = IntStream.range(0, recordCount);
+
+		// filter selection for active only
+		final int activeFieldIndex = buildInfo.getFieldIndex("Active");
+		if (activeFieldIndex == -1) {
+			throw new MalformedCASCStructureException("build info does not contain \"Active\" field");
 		}
-		int recordIndex = 0;
-		for (; recordIndex < recordCount; recordIndex += 1) {
-			if (Integer.parseInt(buildInfo.getField(recordIndex, activeFiledIndex)) == 1) {
-				break;
+		selectedBuilds = selectedBuilds.filter(build -> Integer.parseInt(buildInfo.getField(build, activeFieldIndex)) == 1);
+
+		// filter selection for product
+		if (product != null) {
+			final int productFieldIndex = buildInfo.getFieldIndex("Product");
+			if (productFieldIndex == -1) {
+				throw new MalformedCASCStructureException("build info does not contain \"Product\" field");
 			}
+			selectedBuilds = selectedBuilds.filter(build -> buildInfo.getField(build, productFieldIndex).equals(product));
 		}
-		if (recordIndex == recordCount) {
-			throw new MalformedCASCStructureException("build info contains no active record");
+
+		final OptionalInt selectedBuild = selectedBuilds.findFirst();
+		if (!selectedBuild.isPresent()) {
+			throw new IOException("no matching build");
 		}
-		activeInfoRecord = recordIndex;
+		activeInfoRecord = selectedBuild.getAsInt();
 
 		// resolve build configuration file
 		final int buildKeyFieldIndex = buildInfo.getFieldIndex("Build Key");

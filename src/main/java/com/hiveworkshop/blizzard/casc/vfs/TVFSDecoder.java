@@ -27,7 +27,7 @@ public class TVFSDecoder {
 	 * Flag for container values. If set inside a value then the value is a
 	 * container of other nodes otherwise it is a file.
 	 */
-	private static final int VALUE_CONTAINER_FLAG = 0x80000000;
+	private static final int VALUE_CONTAINER_FLAG = (int) 0x80000000;
 
 	/**
 	 * Specifier for path node value. If path string length is this then value
@@ -155,10 +155,11 @@ public class TVFSDecoder {
 					storageBuffer.get(encodingKeyDecoder);
 
 					final int physicalSize = storageBuffer.getInt();
+					final byte unknownMember1 = storageBuffer.get();
 					final int actualSize = storageBuffer.getInt();
 
 					final StorageReference reference = new StorageReference(offset, size, new Key(encodingKeyDecoder),
-							physicalSize, actualSize);
+							physicalSize, unknownMember1, actualSize);
 					references[i] = reference;
 				} catch (final BufferUnderflowException e) {
 					throw new MalformedCASCStructureException("storage goes out of bounds");
